@@ -51,3 +51,33 @@ def _repair(genes: np.ndarray) -> np.ndarray:
         result[idx] = val
 
     return result
+
+
+def arithmetic_crossover(parent_a: Individual, parent_b: Individual) -> tuple[Individual, Individual]:
+    alpha = np.random.rand()
+    child_a = parent_a.copy()
+    child_b = parent_b.copy()
+    child_a.genes = alpha * parent_a.genes + (1 - alpha) * parent_b.genes
+    child_b.genes = (1 - alpha) * parent_a.genes + alpha * parent_b.genes
+    for child in (child_a, child_b):
+        if child.bounds is not None:
+            child.genes = np.clip(child.genes, child.bounds[:, 0], child.bounds[:, 1])
+        child.invalidate_fitness()
+    return child_a, child_b
+
+
+def blx_alpha_crossover(parent_a: Individual, parent_b: Individual, alpha: float = 0.5) -> tuple[Individual, Individual]:
+    cmin = np.minimum(parent_a.genes, parent_b.genes)
+    cmax = np.maximum(parent_a.genes, parent_b.genes)
+    I = cmax - cmin
+    lo = cmin - alpha * I
+    hi = cmax + alpha * I
+    child_a = parent_a.copy()
+    child_b = parent_b.copy()
+    child_a.genes = np.random.uniform(lo, hi)
+    child_b.genes = np.random.uniform(lo, hi)
+    for child in (child_a, child_b):
+        if child.bounds is not None:
+            child.genes = np.clip(child.genes, child.bounds[:, 0], child.bounds[:, 1])
+        child.invalidate_fitness()
+    return child_a, child_b

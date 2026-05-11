@@ -7,10 +7,11 @@ class Individual(ABC):
 
     def __init__(self, genes: np.ndarray):
         self.genes = genes
-        self._fitness: int | None = None
+        self._fitness: float | None = None
+        self.bounds: np.ndarray | None = None
 
     @property
-    def fitness(self) -> int:
+    def fitness(self) -> float:
         if self._fitness is None:
             self._fitness = self._evaluate()
         return self._fitness
@@ -20,7 +21,7 @@ class Individual(ABC):
         self._fitness = None
 
     @abstractmethod
-    def _evaluate(self) -> int:
+    def _evaluate(self) -> float:
         "Calcula e retorna o valor de aptidão do indivíduo."
 
     @abstractmethod

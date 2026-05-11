@@ -11,7 +11,7 @@ class GAResult:
     solved: bool
     solution: Individual | None
     generation: int
-    best_fitness_history: list[int]
+    best_fitness_history: list[float]
 
 
 def run(
@@ -20,9 +20,19 @@ def run(
     elite_size: int = 2,
     mutation_rate: float = 0.1,
     verbose: bool = False,
+    crossover_fn=None,
+    mutation_fn=None,
+    convergence_fn=None,
 ) -> GAResult:
     pop_size = len(population)
-    best_fitness_history: list[int] = []
+    best_fitness_history: list[float] = []
+
+    if crossover_fn is None:
+        crossover_fn = single_point_crossover
+    if mutation_fn is None:
+        mutation_fn = lambda ind: swap_mutation(ind) if random.random() < mutation_rate else ind
+    if convergence_fn is None:
+        convergence_fn = lambda ind: ind.fitness == 0
 
     for generation in range(1, max_generations + 1):
         # Ordena por fitness crescente (menor = melhor)
@@ -31,9 +41,10 @@ def run(
         best_fitness_history.append(best.fitness)
 
         if verbose:
-            print(f"Geração {generation:4d} | melhor fitness: {best.fitness}")
+            genes_str = ", ".join(f"{g:.4f}" for g in best.genes) if best.genes.dtype.kind == "f" else best.genes.tolist()
+            print(f"Geração {generation:4d} | fitness: {best.fitness:.6f} | genes: [{genes_str}]")
 
-        if best.fitness == 0:
+        if convergence_fn(best):
             return GAResult(
                 solved=True,
                 solution=best.copy(),
@@ -50,12 +61,9 @@ def run(
 
         while len(offspring) < n_offspring:
             parent_a, parent_b = roulette_select(population, 2)
-            child_a, child_b = single_point_crossover(parent_a, parent_b)
-
-            if random.random() < mutation_rate:
-                swap_mutation(child_a)
-            if random.random() < mutation_rate:
-                swap_mutation(child_b)
+            child_a, child_b = crossover_fn(parent_a, parent_b)
+            mutation_fn(child_a)
+            mutation_fn(child_b)
 
             offspring.append(child_a)
             if len(offspring) < n_offspring:
