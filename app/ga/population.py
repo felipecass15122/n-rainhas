@@ -1,5 +1,6 @@
 from problems.nqueens.individual import NQueensIndividual
 from app.problems.rastrigin.individual import RastriginInd
+from app.problems.langermann.individual import LangermannInd
 from ga.individual import Individual
 
 
@@ -9,3 +10,7 @@ def create_population(n_queens: int, size: int) -> list[Individual]:
 
 def create_rastrigin_population(n_dims: int, size: int) -> list[Individual]:
     return [RastriginInd(n_dims) for _ in range(size)]
+
+
+def create_langermann_population(n_dims: int, size: int) -> list[Individual]:
+    return [LangermannInd(n_dims) for _ in range(size)]
