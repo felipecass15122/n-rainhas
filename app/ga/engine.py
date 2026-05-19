@@ -41,8 +41,14 @@ def run(
         best_fitness_history.append(best.fitness)
 
         if verbose:
-            genes_str = ", ".join(f"{g:.4f}" for g in best.genes) if best.genes.dtype.kind == "f" else best.genes.tolist()
-            print(f"Geração {generation:4d} | fitness: {best.fitness:.6f} | genes: [{genes_str}]")
+            if best.genes.dtype.kind == "f":
+                parts = [f"{g:.4f}" for g in best.genes[:5]]
+                if len(best.genes) > 5:
+                    parts.append("...")
+                genes_str = "[" + ", ".join(parts) + "]"
+            else:
+                genes_str = str(best.genes.tolist())
+            print(f"Geração {generation:4d} | fitness: {best.fitness:.8f} | genes: {genes_str}")
 
         if convergence_fn(best):
             return GAResult(

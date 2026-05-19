@@ -20,7 +20,6 @@ def main():
     parser.add_argument("-e", "--elite",   type=int,   default=4,    metavar="ELITE",help="Tamanho do elitismo (padrão: 4)")
     parser.add_argument("-s", "--sigma",   type=float, default=0.1,  metavar="S",    help="Desvio padrão da mutação gaussiana (padrão: 0.1)")
     parser.add_argument("-t", "--tol",     type=float, default=1e-6, metavar="TOL",  help="Tolerância para convergência (padrão: 1e-6)")
-    parser.add_argument("-v", "--verbose", action="store_true",                      help="Exibe progresso por geração")
     args = parser.parse_args()
 
     print(f"\n{'='*50}")
@@ -37,7 +36,7 @@ def main():
         max_generations=args.gens,
         elite_size=args.elite,
         mutation_rate=0.0,
-        verbose=args.verbose,
+        verbose=True,
         crossover_fn=blx_alpha_crossover,
         mutation_fn=lambda ind: gaussian_mutation(ind, sigma=args.sigma, mutation_rate=1 / args.dims),
         convergence_fn=lambda ind: ind.fitness < args.tol,
